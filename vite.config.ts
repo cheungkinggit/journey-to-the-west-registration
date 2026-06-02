@@ -206,7 +206,7 @@ function vitePluginStorageProxy(): Plugin {
 const plugins = [react(), tailwindcss(), jsxLocPlugin(), vitePluginManusRuntime(), vitePluginManusDebugCollector(), vitePluginStorageProxy()];
 
 export default defineConfig({
-  base: process.env.NODE_ENV === "production" ? "/journey-to-the-west-registration/" : "/",
+  base: "/journey-to-the-west-registration/",
   plugins,
   resolve: {
     alias: {

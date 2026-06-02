@@ -19,15 +19,16 @@ export default function Questionnaire({ schoolType }: QuestionnaireProps) {
   const { addRegistration } = useRegistrations();
   const info = SCHOOL_INFO[schoolType];
 
-  // 表單狀態
+  // 表單狀態 - 移除所有預設選項，設為 undefined 或空字串
   const [studentName, setStudentName] = useState('');
-  const [gender, setGender] = useState<'男' | '女'>('男');
-  const [grade, setGrade] = useState<'K1' | 'K2' | 'K3'>('K1');
+  const [gender, setGender] = useState<'男' | '女' | undefined>(undefined);
+  const [grade, setGrade] = useState<'K1' | 'K2' | 'K3' | undefined>(undefined);
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
-  const [parentCount, setParentCount] = useState<'1' | '2'>('1');
-  const [otherChildrenCount, setOtherChildrenCount] = useState<'0' | '1' | '2'>('0');
-  const [willEnroll, setWillEnroll] = useState<'很有意願，本校是首選之一' | '正在考慮中，希望透過活動加深了解' | '純粹參與活動，暫未有定案'>('正在考慮中，希望透過活動加深了解');
+  const [parentCount, setParentCount] = useState<'1' | '2' | undefined>(undefined);
+  const [otherChildrenCount, setOtherChildrenCount] = useState<'0' | '1' | '2' | undefined>(undefined);
+  const [willEnroll, setWillEnroll] = useState<'很有意願，本校是首選之一' | '正在考慮中，希望透過活動加深了解' | '純粹參與活動，暫未有定案' | undefined>(undefined);
+  
   const [agreedGDPR, setAgreedGDPR] = useState(false);
   const [agreedPhoto, setAgreedPhoto] = useState(false);
   
@@ -36,16 +37,47 @@ export default function Questionnaire({ schoolType }: QuestionnaireProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    // 防呆與必填驗證
     if (!studentName.trim()) {
       toast.error('請輸入學生姓名（中文全名）');
+      return;
+    }
+    if (!gender) {
+      toast.error('請選擇學生性別');
+      return;
+    }
+    if (!grade) {
+      toast.error('請選擇現就讀班級');
       return;
     }
     if (!phone.trim()) {
       toast.error('請輸入聯絡電話');
       return;
     }
+    // 簡單的香港電話 8 位數驗證
+    if (!/^\d{8}$/.test(phone.trim())) {
+      toast.error('請輸入正確的 8 位數聯絡電話');
+      return;
+    }
     if (!email.trim()) {
       toast.error('請輸入電郵地址');
+      return;
+    }
+    // 簡單的電郵格式驗證
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      toast.error('請輸入有效的電郵地址');
+      return;
+    }
+    if (!parentCount) {
+      toast.error('請選擇隨行家長人數');
+      return;
+    }
+    if (!otherChildrenCount) {
+      toast.error('請選擇隨行其他兒童人數');
+      return;
+    }
+    if (!willEnroll) {
+      toast.error('請選擇家長未來報讀意願');
       return;
     }
     if (!agreedGDPR) {
@@ -119,8 +151,13 @@ export default function Questionnaire({ schoolType }: QuestionnaireProps) {
               onClick={() => {
                 setIsSubmitted(false);
                 setStudentName('');
+                setGender(undefined);
+                setGrade(undefined);
                 setPhone('');
                 setEmail('');
+                setParentCount(undefined);
+                setOtherChildrenCount(undefined);
+                setWillEnroll(undefined);
                 setAgreedGDPR(false);
                 setAgreedPhoto(false);
               }}
@@ -216,17 +253,25 @@ export default function Questionnaire({ schoolType }: QuestionnaireProps) {
                   學生性別 <span className="text-red-500">*</span>
                 </Label>
                 <RadioGroup 
-                  value={gender} 
+                  value={gender || ""} 
                   onValueChange={(val) => setGender(val as '男' | '女')}
                   className="flex gap-6"
                 >
-                  <div className="flex items-center space-x-2 bg-slate-50 hover:bg-slate-100 px-4 py-2.5 rounded-lg border border-slate-200 cursor-pointer transition-colors">
-                    <RadioGroupItem value="男" id="gender-boy" className="text-amber-600 focus:ring-amber-500" />
-                    <Label htmlFor="gender-boy" className="text-base font-medium text-slate-700 cursor-pointer">男</Label>
+                  <div className={`flex items-center space-x-2 px-4 py-2.5 rounded-lg border cursor-pointer transition-all ${
+                    gender === '男' 
+                      ? 'bg-amber-50 border-amber-400 text-amber-900 font-bold shadow-sm' 
+                      : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-700'
+                  }`} onClick={() => setGender('男')}>
+                    <RadioGroupItem value="男" id="gender-boy" className="text-amber-600 focus:ring-amber-500" checked={gender === '男'} />
+                    <Label htmlFor="gender-boy" className="text-base font-medium cursor-pointer">男</Label>
                   </div>
-                  <div className="flex items-center space-x-2 bg-slate-50 hover:bg-slate-100 px-4 py-2.5 rounded-lg border border-slate-200 cursor-pointer transition-colors">
-                    <RadioGroupItem value="女" id="gender-girl" className="text-amber-600 focus:ring-amber-500" />
-                    <Label htmlFor="gender-girl" className="text-base font-medium text-slate-700 cursor-pointer">女</Label>
+                  <div className={`flex items-center space-x-2 px-4 py-2.5 rounded-lg border cursor-pointer transition-all ${
+                    gender === '女' 
+                      ? 'bg-amber-50 border-amber-400 text-amber-900 font-bold shadow-sm' 
+                      : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-700'
+                  }`} onClick={() => setGender('女')}>
+                    <RadioGroupItem value="女" id="gender-girl" className="text-amber-600 focus:ring-amber-500" checked={gender === '女'} />
+                    <Label htmlFor="gender-girl" className="text-base font-medium cursor-pointer">女</Label>
                   </div>
                 </RadioGroup>
               </div>
@@ -237,17 +282,22 @@ export default function Questionnaire({ schoolType }: QuestionnaireProps) {
                   現就讀班級 <span className="text-red-500">*</span>
                 </Label>
                 <RadioGroup 
-                  value={grade} 
+                  value={grade || ""} 
                   onValueChange={(val) => setGrade(val as 'K1' | 'K2' | 'K3')}
                   className="grid grid-cols-3 gap-4"
                 >
                   {['K1', 'K2', 'K3'].map((g) => (
                     <div 
                       key={g}
-                      className="flex items-center space-x-2 bg-slate-50 hover:bg-slate-100 px-4 py-3 rounded-lg border border-slate-200 cursor-pointer transition-colors justify-center"
+                      className={`flex items-center space-x-2 px-4 py-3 rounded-lg border cursor-pointer transition-all justify-center ${
+                        grade === g 
+                          ? 'bg-amber-50 border-amber-400 text-amber-900 font-bold shadow-sm' 
+                          : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-700'
+                      }`}
+                      onClick={() => setGrade(g as any)}
                     >
-                      <RadioGroupItem value={g} id={`grade-${g}`} className="text-amber-600 focus:ring-amber-500" />
-                      <Label htmlFor={`grade-${g}`} className="text-base font-bold text-slate-700 cursor-pointer">{g}</Label>
+                      <RadioGroupItem value={g} id={`grade-${g}`} className="text-amber-600 focus:ring-amber-500" checked={grade === g} />
+                      <Label htmlFor={`grade-${g}`} className="text-base font-bold cursor-pointer">{g}</Label>
                     </div>
                   ))}
                 </RadioGroup>
@@ -294,17 +344,22 @@ export default function Questionnaire({ schoolType }: QuestionnaireProps) {
                   隨行家長人數（最多由 2 位家長陪同）<span className="text-red-500">*</span>
                 </Label>
                 <RadioGroup 
-                  value={parentCount} 
+                  value={parentCount || ""} 
                   onValueChange={(val) => setParentCount(val as '1' | '2')}
                   className="grid grid-cols-2 gap-4"
                 >
                   {['1', '2'].map((num) => (
                     <div 
                       key={num}
-                      className="flex items-center space-x-2 bg-slate-50 hover:bg-slate-100 px-4 py-3 rounded-lg border border-slate-200 cursor-pointer transition-colors justify-center"
+                      className={`flex items-center space-x-2 px-4 py-3 rounded-lg border cursor-pointer transition-all justify-center ${
+                        parentCount === num 
+                          ? 'bg-amber-50 border-amber-400 text-amber-900 font-bold shadow-sm' 
+                          : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-700'
+                      }`}
+                      onClick={() => setParentCount(num as any)}
                     >
-                      <RadioGroupItem value={num} id={`parent-${num}`} className="text-amber-600 focus:ring-amber-500" />
-                      <Label htmlFor={`parent-${num}`} className="text-base font-medium text-slate-700 cursor-pointer">{num} 人</Label>
+                      <RadioGroupItem value={num} id={`parent-${num}`} className="text-amber-600 focus:ring-amber-500" checked={parentCount === num} />
+                      <Label htmlFor={`parent-${num}`} className="text-base font-medium cursor-pointer">{num} 人</Label>
                     </div>
                   ))}
                 </RadioGroup>
@@ -317,17 +372,22 @@ export default function Questionnaire({ schoolType }: QuestionnaireProps) {
                   隨行其他兒童人數（如弟妹）<span className="text-red-500">*</span>
                 </Label>
                 <RadioGroup 
-                  value={otherChildrenCount} 
+                  value={otherChildrenCount || ""} 
                   onValueChange={(val) => setOtherChildrenCount(val as '0' | '1' | '2')}
                   className="grid grid-cols-3 gap-4"
                 >
                   {['0', '1', '2'].map((num) => (
                     <div 
                       key={num}
-                      className="flex items-center space-x-2 bg-slate-50 hover:bg-slate-100 px-4 py-3 rounded-lg border border-slate-200 cursor-pointer transition-colors justify-center"
+                      className={`flex items-center space-x-2 px-4 py-3 rounded-lg border cursor-pointer transition-all justify-center ${
+                        otherChildrenCount === num 
+                          ? 'bg-amber-50 border-amber-400 text-amber-900 font-bold shadow-sm' 
+                          : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-700'
+                      }`}
+                      onClick={() => setOtherChildrenCount(num as any)}
                     >
-                      <RadioGroupItem value={num} id={`children-${num}`} className="text-amber-600 focus:ring-amber-500" />
-                      <Label htmlFor={`children-${num}`} className="text-base font-medium text-slate-700 cursor-pointer">{num === '0' ? '無' : `${num} 人`}</Label>
+                      <RadioGroupItem value={num} id={`children-${num}`} className="text-amber-600 focus:ring-amber-500" checked={otherChildrenCount === num} />
+                      <Label htmlFor={`children-${num}`} className="text-base font-medium cursor-pointer">{num === '0' ? '無' : `${num} 人`}</Label>
                     </div>
                   ))}
                 </RadioGroup>
@@ -340,7 +400,7 @@ export default function Questionnaire({ schoolType }: QuestionnaireProps) {
                   家長未來是否有意願讓子女報讀本校？ <span className="text-red-500">*</span>
                 </Label>
                 <RadioGroup 
-                  value={willEnroll} 
+                  value={willEnroll || ""} 
                   onValueChange={(val) => setWillEnroll(val as any)}
                   className="space-y-3 mt-2"
                 >
@@ -351,10 +411,15 @@ export default function Questionnaire({ schoolType }: QuestionnaireProps) {
                   ].map((item) => (
                     <div 
                       key={item.val}
-                      className="flex items-start space-x-3 bg-white hover:bg-slate-50 p-3 rounded-lg border border-slate-200 cursor-pointer transition-colors"
+                      className={`flex items-start space-x-3 p-3 rounded-lg border cursor-pointer transition-all ${
+                        willEnroll === item.val 
+                          ? 'bg-white border-amber-400 text-amber-900 font-bold shadow-sm' 
+                          : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-700'
+                      }`}
+                      onClick={() => setWillEnroll(item.val as any)}
                     >
-                      <RadioGroupItem value={item.val} id={`will-${item.val}`} className="text-amber-600 focus:ring-amber-500 mt-1" />
-                      <Label htmlFor={`will-${item.val}`} className="text-base font-medium text-slate-700 cursor-pointer leading-tight">{item.label}</Label>
+                      <RadioGroupItem value={item.val} id={`will-${item.val}`} className="text-amber-600 focus:ring-amber-500 mt-1" checked={willEnroll === item.val} />
+                      <Label htmlFor={`will-${item.val}`} className="text-base font-medium cursor-pointer leading-tight">{item.label}</Label>
                     </div>
                   ))}
                 </RadioGroup>

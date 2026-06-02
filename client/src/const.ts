@@ -1,3 +1,6 @@
+import posterLingLiang from './assets/poster_ling_liang.webp';
+import posterKamLai from './assets/poster_kam_lai.webp';
+
 // 兩所幼稚園的報名初始模擬資料
 export interface Registration {
   id: string;
@@ -152,16 +155,16 @@ export const INITIAL_REGISTRATIONS: Registration[] = [
 export const SCHOOL_INFO = {
   'ling-liang': {
     title: '藍田靈糧幼稚園',
-    logo: 'https://www.lingliang.org.hk/favicon.ico', // Placeholder
+    logo: 'https://www.lingliang.org.hk/favicon.ico',
     bgGradient: 'from-blue-50 to-sky-100',
     accentColor: 'blue',
-    posterUrl: 'https://d2xsxph8kpxj0f.cloudfront.net/310519663574972046/Vcs8rxDnLfAzocfvm4iNsq/poster_ling_liang-1_b81cf4e6.png'
+    posterUrl: posterLingLiang
   },
   'kam-lai': {
     title: '佛教金麗幼稚園',
-    logo: 'https://www.kamlai.edu.hk/favicon.ico', // Placeholder
+    logo: 'https://www.kamlai.edu.hk/favicon.ico',
     bgGradient: 'from-orange-50 to-amber-100',
     accentColor: 'amber',
-    posterUrl: 'https://d2xsxph8kpxj0f.cloudfront.net/310519663574972046/Vcs8rxDnLfAzocfvm4iNsq/poster_kam_lai-1_ef286318.png'
+    posterUrl: posterKamLai
   }
 };

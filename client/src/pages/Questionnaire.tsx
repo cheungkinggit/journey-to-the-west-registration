@@ -8,8 +8,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { ArrowLeft, Send, CheckCircle2, Phone, Mail, Users, Sparkles, HelpCircle } from 'lucide-react';
-import { navigateTo } from '../App';
+import { Send, CheckCircle2, Phone, Mail, Users, Sparkles, HelpCircle } from 'lucide-react';
 
 interface QuestionnaireProps {
   schoolType: 'ling-liang' | 'kam-lai';
@@ -145,9 +144,9 @@ export default function Questionnaire({ schoolType }: QuestionnaireProps) {
             </p>
           </CardContent>
           
-          <CardFooter className="p-6 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row gap-3 justify-center">
+          <CardFooter className="p-6 bg-slate-50 border-t border-slate-100 flex justify-center">
             <Button 
-              variant="outline" 
+              variant="default" 
               onClick={() => {
                 setIsSubmitted(false);
                 setStudentName('');
@@ -161,16 +160,9 @@ export default function Questionnaire({ schoolType }: QuestionnaireProps) {
                 setAgreedGDPR(false);
                 setAgreedPhoto(false);
               }}
-              className="w-full sm:w-auto"
+              className="w-full sm:w-64 bg-amber-600 hover:bg-amber-700 text-white font-bold py-6 text-base rounded-xl"
             >
               再填一份
-            </Button>
-            <Button 
-              variant="default" 
-              onClick={() => navigateTo('')}
-              className="w-full sm:w-auto bg-amber-600 hover:bg-amber-700 text-white"
-            >
-              返回主頁
             </Button>
           </CardFooter>
         </Card>
@@ -181,19 +173,9 @@ export default function Questionnaire({ schoolType }: QuestionnaireProps) {
   return (
     <div className={`min-h-screen bg-gradient-to-b ${info.bgGradient} py-8 px-4 md:py-12`}>
       <div className="max-w-3xl mx-auto space-y-8">
-        
-        {/* 返回按鈕 */}
-        <Button 
-          variant="ghost" 
-          onClick={() => navigateTo('')}
-          className="hover:bg-white/50 text-slate-700 font-medium"
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          返回主頁
-        </Button>
 
         {/* 頂部橫幅 */}
-        <div className="text-center space-y-4">
+        <div className="text-center space-y-4 pt-4">
           <div className="flex justify-center items-center gap-4">
             <span className="text-sm bg-white/80 backdrop-blur border border-amber-200 text-amber-800 font-bold px-3 py-1 rounded-full shadow-sm">
               藍田循道衛理小學 主辦

@@ -1,23 +1,63 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useRegistrations } from '../contexts/RegistrationContext';
-import { SCHOOL_INFO } from '../const';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { ArrowLeft, Download, Trash2, Search, Filter, BarChart3, Users, School, PieChart, Info } from 'lucide-react';
+import { ArrowLeft, Download, Trash2, Search, Filter, BarChart3, Users, School, PieChart, Info, Lock, KeyRound, QrCode } from 'lucide-react';
 import { navigateTo } from '../App';
+import QRCodeGenerator from '../components/QRCodeGenerator';
 
 export default function Dashboard() {
   const { registrations, deleteRegistration, clearAll } = useRegistrations();
+
+  // 安全鎖狀態
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [password, setPassword] = useState('');
 
   // 搜尋與篩選狀態
   const [searchQuery, setSearchQuery] = useState('');
   const [schoolFilter, setSchoolFilter] = useState<string>('all');
   const [gradeFilter, setGradeFilter] = useState<string>('all');
   const [willEnrollFilter, setWillEnrollFilter] = useState<string>('all');
+
+  // 取得當前網頁的 Origin (用於動態生成 QR Code 連結)
+  const currentOrigin = useMemo(() => {
+    return window.location.origin + window.location.pathname;
+  }, []);
+
+  const lingLiangUrl = `${currentOrigin}?school=ling-liang`;
+  const kamLaiUrl = `${currentOrigin}?school=kam-lai`;
+
+  // 檢查是否已在 SessionStorage 中驗證過
+  useEffect(() => {
+    const authState = sessionStorage.getItem('ltms_dashboard_auth');
+    if (authState === 'true') {
+      setIsAuthenticated(true);
+    }
+  }, []);
+
+  // 密碼驗證處理
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password === 'ltms2026') {
+      setIsAuthenticated(true);
+      sessionStorage.setItem('ltms_dashboard_auth', 'true');
+      toast.success('密碼驗證成功！歡迎進入管理後台。');
+    } else {
+      toast.error('密碼錯誤，請重新輸入！');
+      setPassword('');
+    }
+  };
+
+  // 登出/鎖定後台
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    sessionStorage.removeItem('ltms_dashboard_auth');
+    toast.info('已鎖定管理後台');
+  };
 
   // 統計指標計算
   const stats = useMemo(() => {
@@ -83,7 +123,6 @@ export default function Dashboard() {
       return;
     }
 
-    // 建立 HTML Table 格式的 Excel 檔案（支援中文與樣式）
     let html = `
       <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
       <head>
@@ -140,13 +179,11 @@ export default function Dashboard() {
       </html>
     `;
 
-    // 建立 Blob 並下載
     const blob = new Blob([html], { type: 'application/vnd.ms-excel;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
     
-    // 檔名加上當前日期
     const dateStr = new Date().toISOString().split('T')[0];
     link.setAttribute('download', `西遊記活動日報名統計_${dateStr}.xls`);
     document.body.appendChild(link);
@@ -170,6 +207,66 @@ export default function Dashboard() {
     }
   };
 
+  // 1. 未授權狀態：顯示安全鎖解鎖介面
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-slate-100 to-slate-200 flex flex-col items-center justify-center p-4">
+        <div className="max-w-md w-full">
+          
+          <Button 
+            variant="ghost" 
+            onClick={() => navigateTo('')}
+            className="mb-4 text-slate-600 hover:text-slate-900"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            返回首頁
+          </Button>
+
+          <Card className="border border-slate-200 shadow-xl rounded-2xl bg-white overflow-hidden">
+            <div className="bg-slate-800 py-6 text-center text-white relative">
+              <Lock className="w-12 h-12 mx-auto mb-2 text-amber-500 animate-pulse" />
+              <CardTitle className="text-xl font-bold">問卷統計後台安全鎖</CardTitle>
+              <CardDescription className="text-slate-300 text-xs mt-1">
+                此頁面包含個人隱私資料，請輸入密碼以解鎖。
+              </CardDescription>
+            </div>
+            
+            <form onSubmit={handleLogin}>
+              <CardContent className="p-6 space-y-4">
+                <div className="space-y-2">
+                  <label htmlFor="password" className="text-sm font-bold text-slate-700 flex items-center gap-1.5">
+                    <KeyRound className="w-4 h-4 text-slate-500" />
+                    管理密碼
+                  </label>
+                  <Input 
+                    id="password"
+                    type="password"
+                    placeholder="請輸入密碼 (預設：ltms2026)"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="border-slate-200 focus-visible:ring-amber-500 h-11 text-base rounded-lg text-center"
+                    autoFocus
+                    required
+                  />
+                </div>
+              </CardContent>
+              
+              <CardContent className="px-6 pb-6 pt-0">
+                <Button 
+                  type="submit" 
+                  className="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-5 rounded-lg shadow"
+                >
+                  解鎖進入後台
+                </Button>
+              </CardContent>
+            </form>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  // 2. 已授權狀態：顯示完整的管理後台
   return (
     <div className="min-h-screen bg-slate-50 py-8 px-4 md:px-8">
       <div className="max-w-7xl mx-auto space-y-8">
@@ -191,6 +288,14 @@ export default function Dashboard() {
           <div className="flex gap-3">
             <Button 
               variant="outline" 
+              onClick={handleLogout}
+              className="border-slate-200 text-slate-700 hover:bg-slate-100"
+            >
+              <Lock className="w-4 h-4 mr-2" />
+              鎖定後台
+            </Button>
+            <Button 
+              variant="outline" 
               onClick={handleResetData}
               className="border-red-200 text-red-600 hover:bg-red-50"
             >
@@ -206,6 +311,38 @@ export default function Dashboard() {
             </Button>
           </div>
         </div>
+
+        {/* QR Code 與推廣連結中心 */}
+        <Card className="border border-amber-200 shadow-md bg-amber-50/20 overflow-hidden rounded-2xl">
+          <CardHeader className="bg-amber-500/10 border-b border-amber-200/50 p-6">
+            <CardTitle className="text-lg font-bold text-amber-950 flex items-center gap-2">
+              <QrCode className="w-5 h-5 text-amber-600 animate-pulse" />
+              宣傳與專屬 QR Code 下載中心
+            </CardTitle>
+            <CardDescription className="text-amber-800 text-sm mt-1">
+              您可以直接複製下方專屬連結或下載 QR Code 圖片，用於兩所幼稚園的宣傳海報。
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              
+              {/* 藍田靈糧幼稚園 QR Code */}
+              <QRCodeGenerator 
+                url={lingLiangUrl} 
+                title="🌸 藍田靈糧幼稚園 專屬報名問卷" 
+                fileName="藍田靈糧幼稚園_報名問卷_QRCode"
+              />
+
+              {/* 佛教金麗幼稚園 QR Code */}
+              <QRCodeGenerator 
+                url={kamLaiUrl} 
+                title="☀️ 佛教金麗幼稚園 專屬報名問卷" 
+                fileName="佛教金麗幼稚園_報名問卷_QRCode"
+              />
+
+            </div>
+          </CardContent>
+        </Card>
 
         {/* 數據看板 (Stats Grid) */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">

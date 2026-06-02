@@ -1,17 +1,16 @@
 import React, { useState, useMemo } from 'react';
-import { useLocation } from 'wouter';
 import { useRegistrations } from '../contexts/RegistrationContext';
-import { SCHOOL_INFO, Registration } from '../const';
+import { SCHOOL_INFO } from '../const';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { ArrowLeft, Download, Trash2, Search, Filter, RefreshCw, BarChart3, Users, School, PieChart, Info } from 'lucide-react';
+import { ArrowLeft, Download, Trash2, Search, Filter, BarChart3, Users, School, PieChart, Info } from 'lucide-react';
+import { navigateTo } from '../App';
 
 export default function Dashboard() {
-  const [, setLocation] = useLocation();
   const { registrations, deleteRegistration, clearAll } = useRegistrations();
 
   // 搜尋與篩選狀態
@@ -180,7 +179,7 @@ export default function Dashboard() {
           <div>
             <Button 
               variant="ghost" 
-              onClick={() => setLocation('/')}
+              onClick={() => navigateTo('')}
               className="mb-2 text-slate-600 hover:text-slate-900"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />

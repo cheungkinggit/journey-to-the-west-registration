@@ -1,12 +1,10 @@
 import React from 'react';
-import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Sparkles, BarChart3, ArrowRight, GraduationCap, Compass, BookOpen } from 'lucide-react';
+import { navigateTo } from '../App';
 
 export default function Home() {
-  const [, setLocation] = useLocation();
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 via-orange-50 to-amber-100 flex flex-col">
       
@@ -21,7 +19,7 @@ export default function Home() {
         </div>
         <Button 
           variant="outline" 
-          onClick={() => setLocation('/dashboard')}
+          onClick={() => navigateTo('?page=dashboard')}
           className="border-amber-200 text-amber-800 hover:bg-amber-50 font-semibold"
         >
           <BarChart3 className="w-4 h-4 mr-2" />
@@ -43,7 +41,7 @@ export default function Home() {
               2026 年度活動日
             </span>
             <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight leading-tight">
-              藍盾同心 ‧ 玩轉西遊
+              藍循同心 ‧ 玩轉西遊
             </h2>
             <p className="text-lg text-amber-50 max-w-xl leading-relaxed">
               西遊取經，志在千里！藍田循道衛理小學誠邀幼稚園小朋友與家長一同前來，在豐富的中華文化體驗與有趣的攤位遊戲中，認識西遊記不畏艱難的奮鬥精神。
@@ -105,7 +103,7 @@ export default function Home() {
               </CardContent>
               <CardFooter className="p-6 bg-slate-50 border-t border-slate-100">
                 <Button 
-                  onClick={() => setLocation('/survey/ling-liang')}
+                  onClick={() => navigateTo('?school=ling-liang')}
                   className="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold group-hover:scale-[1.02] transition-transform"
                 >
                   進入問卷
@@ -134,7 +132,7 @@ export default function Home() {
               </CardContent>
               <CardFooter className="p-6 bg-slate-50 border-t border-slate-100">
                 <Button 
-                  onClick={() => setLocation('/survey/kam-lai')}
+                  onClick={() => navigateTo('?school=kam-lai')}
                   className="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold group-hover:scale-[1.02] transition-transform"
                 >
                   進入問卷

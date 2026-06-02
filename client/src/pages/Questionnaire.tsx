@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useRoute, useLocation } from 'wouter';
 import { useRegistrations } from '../contexts/RegistrationContext';
 import { SCHOOL_INFO } from '../const';
 import { Button } from '@/components/ui/button';
@@ -10,13 +9,14 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { ArrowLeft, Send, CheckCircle2, Phone, Mail, Users, Sparkles, HelpCircle } from 'lucide-react';
+import { navigateTo } from '../App';
 
-export default function Questionnaire() {
-  const [, params] = useRoute('/survey/:school');
-  const [, setLocation] = useLocation();
+interface QuestionnaireProps {
+  schoolType: 'ling-liang' | 'kam-lai';
+}
+
+export default function Questionnaire({ schoolType }: QuestionnaireProps) {
   const { addRegistration } = useRegistrations();
-  
-  const schoolType = params?.school === 'ling-liang' ? 'ling-liang' : 'kam-lai';
   const info = SCHOOL_INFO[schoolType];
 
   // 表單狀態
@@ -130,7 +130,7 @@ export default function Questionnaire() {
             </Button>
             <Button 
               variant="default" 
-              onClick={() => setLocation('/')}
+              onClick={() => navigateTo('')}
               className="w-full sm:w-auto bg-amber-600 hover:bg-amber-700 text-white"
             >
               返回主頁
@@ -148,7 +148,7 @@ export default function Questionnaire() {
         {/* 返回按鈕 */}
         <Button 
           variant="ghost" 
-          onClick={() => setLocation('/')}
+          onClick={() => navigateTo('')}
           className="hover:bg-white/50 text-slate-700 font-medium"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -163,10 +163,10 @@ export default function Questionnaire() {
             </span>
           </div>
           <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">
-            藍盾同心 ‧ 玩轉西遊
+            藍循同心 ‧ 玩轉西遊
           </h1>
           <p className="text-lg text-slate-700 font-medium max-w-xl mx-auto">
-            誠邀 <span className="text-amber-700 font-bold">{info.title}</span> 的小朋友及家長，一起來到藍盾，跟師徒四人玩轉西遊！
+            誠邀 <span className="text-amber-700 font-bold">{info.title}</span> 的小朋友及家長，一起來到藍循，跟師徒四人玩轉西遊！
           </p>
         </div>
 

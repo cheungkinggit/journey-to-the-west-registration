@@ -39,10 +39,10 @@ export default function Dashboard() {
     }
   }, []);
 
-  // 密碼驗證處理
+  // 密碼驗證處理 - 修改密碼為 ltmps0612
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === 'ltms2026') {
+    if (password === 'ltmps0612') {
       setIsAuthenticated(true);
       sessionStorage.setItem('ltms_dashboard_auth', 'true');
       toast.success('密碼驗證成功！歡迎進入管理後台。');
@@ -241,7 +241,7 @@ export default function Dashboard() {
                   <Input 
                     id="password"
                     type="password"
-                    placeholder="請輸入密碼 (預設：ltms2026)"
+                    placeholder="請輸入密碼"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="border-slate-200 focus-visible:ring-amber-500 h-11 text-base rounded-lg text-center"

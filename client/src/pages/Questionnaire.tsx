@@ -5,10 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { Send, CheckCircle2, Phone, Mail, Users, Sparkles, HelpCircle } from 'lucide-react';
+import { Send, CheckCircle2, Mail, Users, Sparkles } from 'lucide-react';
 
 interface QuestionnaireProps {
   schoolType: 'ling-liang' | 'kam-lai';
@@ -18,18 +17,13 @@ export default function Questionnaire({ schoolType }: QuestionnaireProps) {
   const { addRegistration } = useRegistrations();
   const info = SCHOOL_INFO[schoolType];
 
-  // 表單狀態 - 移除所有預設選項，設為 undefined 或空字串
+  // 表單狀態 - 已移除聯絡電話與意願欄位
   const [studentName, setStudentName] = useState('');
   const [gender, setGender] = useState<'男' | '女' | undefined>(undefined);
   const [grade, setGrade] = useState<'K1' | 'K2' | 'K3' | undefined>(undefined);
-  const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [parentCount, setParentCount] = useState<'1' | '2' | undefined>(undefined);
   const [otherChildrenCount, setOtherChildrenCount] = useState<'0' | '1' | '2' | undefined>(undefined);
-  const [willEnroll, setWillEnroll] = useState<'很有意願，本校是首選之一' | '正在考慮中，希望透過活動加深了解' | '純粹參與活動，暫未有定案' | undefined>(undefined);
-  
-  const [agreedGDPR, setAgreedGDPR] = useState(false);
-  const [agreedPhoto, setAgreedPhoto] = useState(false);
   
   const [isSubmitted, setIsSubmitted] = useState(false);
 
@@ -49,20 +43,10 @@ export default function Questionnaire({ schoolType }: QuestionnaireProps) {
       toast.error('請選擇現就讀班級');
       return;
     }
-    if (!phone.trim()) {
-      toast.error('請輸入聯絡電話');
-      return;
-    }
-    // 簡單的香港電話 8 位數驗證
-    if (!/^\d{8}$/.test(phone.trim())) {
-      toast.error('請輸入正確的 8 位數聯絡電話');
-      return;
-    }
     if (!email.trim()) {
       toast.error('請輸入電郵地址');
       return;
     }
-    // 簡單的電郵格式驗證
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
       toast.error('請輸入有效的電郵地址');
       return;
@@ -75,25 +59,15 @@ export default function Questionnaire({ schoolType }: QuestionnaireProps) {
       toast.error('請選擇隨行其他兒童人數');
       return;
     }
-    if (!willEnroll) {
-      toast.error('請選擇家長未來報讀意願');
-      return;
-    }
-    if (!agreedGDPR) {
-      toast.error('您必須同意個人資料收集聲明以進行報名');
-      return;
-    }
 
     addRegistration({
       schoolType,
       studentName,
       gender,
       grade,
-      phone,
       email,
       parentCount,
-      otherChildrenCount,
-      willEnroll
+      otherChildrenCount
     });
 
     setIsSubmitted(true);
@@ -130,7 +104,6 @@ export default function Questionnaire({ schoolType }: QuestionnaireProps) {
               <h3 className="font-bold text-amber-900 border-b border-amber-200 pb-2 text-center">報名資料摘要</h3>
               <p className="text-sm text-slate-700"><span className="font-semibold text-slate-900">學生姓名：</span>{studentName}</p>
               <p className="text-sm text-slate-700"><span className="font-semibold text-slate-900">現就讀班級：</span>{grade} ({gender})</p>
-              <p className="text-sm text-slate-700"><span className="font-semibold text-slate-900">聯絡電話：</span>{phone}</p>
               <p className="text-sm text-slate-700"><span className="font-semibold text-slate-900">確認信箱：</span>{email}</p>
               <p className="text-sm text-slate-700"><span className="font-semibold text-slate-900">隨行家長：</span>{parentCount} 人</p>
               {otherChildrenCount !== '0' && (
@@ -152,13 +125,9 @@ export default function Questionnaire({ schoolType }: QuestionnaireProps) {
                 setStudentName('');
                 setGender(undefined);
                 setGrade(undefined);
-                setPhone('');
                 setEmail('');
                 setParentCount(undefined);
                 setOtherChildrenCount(undefined);
-                setWillEnroll(undefined);
-                setAgreedGDPR(false);
-                setAgreedPhoto(false);
               }}
               className="w-full sm:w-64 bg-amber-600 hover:bg-amber-700 text-white font-bold py-6 text-base rounded-xl"
             >
@@ -285,27 +254,10 @@ export default function Questionnaire({ schoolType }: QuestionnaireProps) {
                 </RadioGroup>
               </div>
 
-              {/* 聯絡電話 */}
-              <div className="space-y-2">
-                <Label htmlFor="phone" className="text-base font-bold text-slate-900 flex items-center gap-1.5">
-                  <Phone className="w-4 h-4 text-slate-500" />
-                  聯絡電話（可接收 WhatsApp 通知）<span className="text-red-500">*</span>
-                </Label>
-                <Input 
-                  id="phone"
-                  type="tel"
-                  placeholder="例如：91234567"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className="border-slate-200 focus-visible:ring-amber-500 h-11 text-base rounded-lg"
-                  required
-                />
-              </div>
-
               {/* 電郵地址 */}
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-base font-bold text-slate-900 flex items-center gap-1.5">
-                  <Mail className="w-4 h-4 text-slate-500" />
+                  <span className="text-slate-500">✉</span>
                   電郵地址（發送確認信及活動須知用）<span className="text-red-500">*</span>
                 </Label>
                 <Input 
@@ -319,11 +271,11 @@ export default function Questionnaire({ schoolType }: QuestionnaireProps) {
                 />
               </div>
 
-              {/* 隨行家長人數 */}
+              {/* 隨行家長人數 - 題目已改名 */}
               <div className="space-y-3">
                 <Label className="text-base font-bold text-slate-900 flex items-center gap-1.5">
                   <Users className="w-4 h-4 text-slate-500" />
-                  隨行家長人數（最多由 2 位家長陪同）<span className="text-red-500">*</span>
+                  隨行家長人數 <span className="text-red-500">*</span>
                 </Label>
                 <RadioGroup 
                   value={parentCount || ""} 
@@ -375,71 +327,17 @@ export default function Questionnaire({ schoolType }: QuestionnaireProps) {
                 </RadioGroup>
               </div>
 
-              {/* 家長未來意願 */}
-              <div className="space-y-3 bg-amber-50/40 p-5 rounded-xl border border-amber-100">
-                <Label className="text-base font-bold text-amber-900 flex items-center gap-1.5">
-                  <HelpCircle className="w-4 h-4 text-amber-700" />
-                  家長未來是否有意願讓子女報讀本校？ <span className="text-red-500">*</span>
-                </Label>
-                <RadioGroup 
-                  value={willEnroll || ""} 
-                  onValueChange={(val) => setWillEnroll(val as any)}
-                  className="space-y-3 mt-2"
-                >
-                  {[
-                    { val: '很有意願，本校是首選之一', label: '很有意願，本校是首選之一' },
-                    { val: '正在考慮中，希望透過活動加深了解', label: '正在考慮中，希望透過活動加深了解' },
-                    { val: '純粹參與活動，暫未有定案', label: '純粹參與活動，暫未有定案' }
-                  ].map((item) => (
-                    <div 
-                      key={item.val}
-                      className={`flex items-start space-x-3 p-3 rounded-lg border cursor-pointer transition-all ${
-                        willEnroll === item.val 
-                          ? 'bg-white border-amber-400 text-amber-900 font-bold shadow-sm' 
-                          : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-700'
-                      }`}
-                      onClick={() => setWillEnroll(item.val as any)}
-                    >
-                      <RadioGroupItem value={item.val} id={`will-${item.val}`} className="text-amber-600 focus:ring-amber-500 mt-1" checked={willEnroll === item.val} />
-                      <Label htmlFor={`will-${item.val}`} className="text-base font-medium cursor-pointer leading-tight">{item.label}</Label>
-                    </div>
-                  ))}
-                </RadioGroup>
-              </div>
-
-              {/* 個人資料收集聲明 */}
+              {/* 個人資料收集聲明 - 移除 Checkbox，改為純文字展示 */}
               <div className="space-y-4 border-t border-slate-100 pt-6">
                 <h4 className="font-bold text-slate-900 text-base">個人資料收集聲明及條款</h4>
                 
-                <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 text-xs text-slate-600 space-y-2 leading-relaxed">
+                <div className="bg-slate-50 p-5 rounded-xl border border-slate-200 text-sm text-slate-700 space-y-3 leading-relaxed">
+                  <p className="font-medium text-slate-900">重要聲明：</p>
                   <p>1. 此問卷所收集的資料只用作是次活動報名之用，並會於活動後一段時間內銷毀。</p>
                   <p>2. 本校將於活動期間進行攝影及錄影，相片或影片可能用於學校網頁、社交媒體或宣傳刊物。</p>
-                </div>
-
-                <div className="space-y-3">
-                  <div className="flex items-start space-x-3">
-                    <Checkbox 
-                      id="agreedGDPR" 
-                      checked={agreedGDPR}
-                      onCheckedChange={(checked) => setAgreedGDPR(!!checked)}
-                      className="mt-1 border-slate-300 text-amber-600 focus:ring-amber-500"
-                    />
-                    <Label htmlFor="agreedGDPR" className="text-sm font-medium text-slate-700 leading-tight cursor-pointer">
-                      我同意上述個人資料收集聲明，並確認所填寫的資料正確無誤。 <span className="text-red-500">*</span>
-                    </Label>
-                  </div>
-
-                  <div className="flex items-start space-x-3">
-                    <Checkbox 
-                      id="agreedPhoto" 
-                      checked={agreedPhoto}
-                      onCheckedChange={(checked) => setAgreedPhoto(!!checked)}
-                      className="mt-1 border-slate-300 text-amber-600 focus:ring-amber-500"
-                    />
-                    <Label htmlFor="agreedPhoto" className="text-sm font-medium text-slate-700 leading-tight cursor-pointer">
-                      我同意學校在活動期間進行拍攝，並授權合理使用活動相片及影片。
-                    </Label>
-                  </div>
+                  <p className="text-xs text-amber-800 font-semibold mt-2 border-t border-amber-100 pt-2">
+                    * 提交此問卷即代表您已閱讀、理解並同意上述個人資料收集聲明及相應條款。
+                  </p>
                 </div>
               </div>
 

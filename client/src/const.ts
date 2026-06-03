@@ -1,18 +1,16 @@
 import posterLingLiang from './assets/poster_ling_liang.webp';
 import posterKamLai from './assets/poster_kam_lai.webp';
 
-// 兩所幼稚園的報名初始模擬資料
+// 兩所幼稚園的報名初始模擬資料 (已移除聯絡電話與報讀意願)
 export interface Registration {
   id: string;
   schoolType: 'ling-liang' | 'kam-lai'; // 藍田靈糧幼稚園 或 佛教金麗幼稚園
   studentName: string;
   gender: '男' | '女';
   grade: 'K1' | 'K2' | 'K3';
-  phone: string;
   email: string;
   parentCount: '1' | '2';
   otherChildrenCount: '0' | '1' | '2';
-  willEnroll: '很有意願，本校是首選之一' | '正在考慮中，希望透過活動加深了解' | '純粹參與活動，暫未有定案';
   createdAt: string;
 }
 
@@ -24,11 +22,9 @@ export const INITIAL_REGISTRATIONS: Registration[] = [
     studentName: '陳小明',
     gender: '男',
     grade: 'K3',
-    phone: '98765432',
     email: 'chanxiaoming@email.com',
     parentCount: '2',
     otherChildrenCount: '1',
-    willEnroll: '很有意願，本校是首選之一',
     createdAt: '2026-06-01 10:15'
   },
   {
@@ -37,11 +33,9 @@ export const INITIAL_REGISTRATIONS: Registration[] = [
     studentName: '李美美',
     gender: '女',
     grade: 'K2',
-    phone: '91234567',
     email: 'leemeimei@email.com',
     parentCount: '1',
     otherChildrenCount: '0',
-    willEnroll: '正在考慮中，希望透過活動加深了解',
     createdAt: '2026-06-01 14:30'
   },
   {
@@ -50,11 +44,9 @@ export const INITIAL_REGISTRATIONS: Registration[] = [
     studentName: '張子軒',
     gender: '男',
     grade: 'K1',
-    phone: '93456789',
     email: 'cheungtszhin@email.com',
     parentCount: '2',
     otherChildrenCount: '2',
-    willEnroll: '純粹參與活動，暫未有定案',
     createdAt: '2026-06-02 09:12'
   },
   {
@@ -63,11 +55,9 @@ export const INITIAL_REGISTRATIONS: Registration[] = [
     studentName: '黃雨晴',
     gender: '女',
     grade: 'K3',
-    phone: '95678901',
     email: 'wongyuqing@email.com',
     parentCount: '1',
     otherChildrenCount: '1',
-    willEnroll: '很有意願，本校是首選之一',
     createdAt: '2026-06-02 11:45'
   },
   {
@@ -76,11 +66,9 @@ export const INITIAL_REGISTRATIONS: Registration[] = [
     studentName: '林宇航',
     gender: '男',
     grade: 'K2',
-    phone: '97890123',
     email: 'lamyuhang@email.com',
     parentCount: '2',
     otherChildrenCount: '0',
-    willEnroll: '正在考慮中，希望透過活動加深了解',
     createdAt: '2026-06-02 16:20'
   },
 
@@ -91,11 +79,9 @@ export const INITIAL_REGISTRATIONS: Registration[] = [
     studentName: '劉星宇',
     gender: '男',
     grade: 'K3',
-    phone: '61234567',
     email: 'lausingyu@email.com',
     parentCount: '2',
     otherChildrenCount: '0',
-    willEnroll: '很有意願，本校是首選之一',
     createdAt: '2026-06-01 11:05'
   },
   {
@@ -104,11 +90,9 @@ export const INITIAL_REGISTRATIONS: Registration[] = [
     studentName: '趙雅琪',
     gender: '女',
     grade: 'K3',
-    phone: '62345678',
     email: 'chiuyakee@email.com',
     parentCount: '1',
     otherChildrenCount: '1',
-    willEnroll: '正在考慮中，希望透過活動加深了解',
     createdAt: '2026-06-01 15:40'
   },
   {
@@ -117,11 +101,9 @@ export const INITIAL_REGISTRATIONS: Registration[] = [
     studentName: '周梓謙',
     gender: '男',
     grade: 'K2',
-    phone: '63456789',
     email: 'choutsbhim@email.com',
     parentCount: '2',
     otherChildrenCount: '2',
-    willEnroll: '純粹參與活動，暫未有定案',
     createdAt: '2026-06-02 10:00'
   },
   {
@@ -130,11 +112,9 @@ export const INITIAL_REGISTRATIONS: Registration[] = [
     studentName: '吳凱晴',
     gender: '女',
     grade: 'K1',
-    phone: '64567890',
     email: 'nghoiching@email.com',
     parentCount: '1',
     otherChildrenCount: '0',
-    willEnroll: '正在考慮中，希望透過活動加深了解',
     createdAt: '2026-06-02 13:15'
   },
   {
@@ -143,11 +123,9 @@ export const INITIAL_REGISTRATIONS: Registration[] = [
     studentName: '梁樂軒',
     gender: '男',
     grade: 'K2',
-    phone: '65678901',
     email: 'leunglokhin@email.com',
     parentCount: '2',
     otherChildrenCount: '1',
-    willEnroll: '很有意願，本校是首選之一',
     createdAt: '2026-06-02 17:30'
   }
 ];

@@ -21,7 +21,6 @@ export default function Dashboard() {
   const [searchQuery, setSearchQuery] = useState('');
   const [schoolFilter, setSchoolFilter] = useState<string>('all');
   const [gradeFilter, setGradeFilter] = useState<string>('all');
-  const [willEnrollFilter, setWillEnrollFilter] = useState<string>('all');
 
   // 取得當前網頁的 Origin (用於動態生成 QR Code 連結)
   const currentOrigin = useMemo(() => {
@@ -39,7 +38,7 @@ export default function Dashboard() {
     }
   }, []);
 
-  // 密碼驗證處理 - 修改密碼為 ltmps0612
+  // 密碼驗證處理 - 密碼 ltmps0612
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     if (password === 'ltmps0612') {
@@ -59,7 +58,7 @@ export default function Dashboard() {
     toast.info('已鎖定管理後台');
   };
 
-  // 統計指標計算
+  // 統計指標計算 (已移除報讀意願統計)
   const stats = useMemo(() => {
     const total = registrations.length;
     const lingLiangCount = registrations.filter(r => r.schoolType === 'ling-liang').length;
@@ -81,13 +80,6 @@ export default function Dashboard() {
       }
     });
 
-    // 報讀意願分佈
-    const enrollIntent = {
-      high: registrations.filter(r => r.willEnroll === '很有意願，本校是首選之一').length,
-      considering: registrations.filter(r => r.willEnroll === '正在考慮中，希望透過活動加深了解').length,
-      neutral: registrations.filter(r => r.willEnroll === '純粹參與活動，暫未有定案').length,
-    };
-
     return {
       total,
       lingLiangCount,
@@ -95,28 +87,25 @@ export default function Dashboard() {
       totalParents,
       totalChildren,
       totalAttendees: total + totalParents + totalChildren,
-      grades,
-      enrollIntent
+      grades
     };
   }, [registrations]);
 
-  // 過濾後的報名資料
+  // 過濾後的報名資料 (已移除電話與意願過濾)
   const filteredRegistrations = useMemo(() => {
     return registrations.filter(r => {
       const matchesSearch = 
         r.studentName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        r.phone.includes(searchQuery) ||
         r.email.toLowerCase().includes(searchQuery.toLowerCase());
       
       const matchesSchool = schoolFilter === 'all' || r.schoolType === schoolFilter;
       const matchesGrade = gradeFilter === 'all' || r.grade === gradeFilter;
-      const matchesWillEnroll = willEnrollFilter === 'all' || r.willEnroll === willEnrollFilter;
 
-      return matchesSearch && matchesSchool && matchesGrade && matchesWillEnroll;
+      return matchesSearch && matchesSchool && matchesGrade;
     });
-  }, [registrations, searchQuery, schoolFilter, gradeFilter, willEnrollFilter]);
+  }, [registrations, searchQuery, schoolFilter, gradeFilter]);
 
-  // 匯出 XLS 功能（使用 HTML Table 格式，Excel 可直接相容讀取）
+  // 匯出 XLS 功能 (已移除聯絡電話與報讀意願列)
   const handleExportXLS = () => {
     if (filteredRegistrations.length === 0) {
       toast.error('沒有可匯出的資料！');
@@ -137,7 +126,7 @@ export default function Dashboard() {
       <body>
         <table>
           <tr>
-            <th colspan="11" class="title-row">藍田循道衛理小學西遊記活動日 - 報名問卷統計資料</th>
+            <th colspan="9" class="title-row">藍田循道衛理小學西遊記活動日 - 報名問卷統計資料</th>
           </tr>
           <tr>
             <th>報名編號</th>
@@ -145,11 +134,9 @@ export default function Dashboard() {
             <th>學生姓名</th>
             <th>學生性別</th>
             <th>現就讀班級</th>
-            <th>聯絡電話</th>
             <th>電郵地址</th>
             <th>隨行家長人數</th>
             <th>隨行其他兒童人數</th>
-            <th>未來報讀意願</th>
             <th>填寫時間</th>
           </tr>
     `;
@@ -163,11 +150,9 @@ export default function Dashboard() {
           <td>${r.studentName}</td>
           <td>${r.gender}</td>
           <td>${r.grade}</td>
-          <td style="mso-number-format:'\\@';">${r.phone}</td>
           <td>${r.email}</td>
           <td>${r.parentCount} 人</td>
           <td>${r.otherChildrenCount} 人</td>
-          <td>${r.willEnroll}</td>
           <td>${r.createdAt}</td>
         </tr>
       `;
@@ -393,8 +378,8 @@ export default function Dashboard() {
 
         </div>
 
-        {/* 視覺化圖表與比例 (Visual Stats Cards) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* 視覺化圖表與比例 (已移除意願圖表) */}
+        <div className="grid grid-cols-1 gap-6">
           
           {/* 班級分佈 */}
           <Card className="border border-slate-200 shadow-sm bg-white">
@@ -426,53 +411,18 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-          {/* 報讀意願分佈 */}
-          <Card className="border border-slate-200 shadow-sm bg-white">
-            <CardHeader className="border-b border-slate-100">
-              <CardTitle className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                <PieChart className="w-5 h-5 text-blue-600" />
-                未來報讀本校意願分佈
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-6 space-y-4">
-              {[
-                { key: 'high', label: '很有意願，本校是首選之一', color: 'bg-emerald-500', count: stats.enrollIntent.high },
-                { key: 'considering', label: '正在考慮中，希望透過活動加深了解', color: 'bg-amber-500', count: stats.enrollIntent.considering },
-                { key: 'neutral', label: '純粹參與活動，暫未有定案', color: 'bg-slate-400', count: stats.enrollIntent.neutral }
-              ].map(item => {
-                const percent = stats.total ? Math.round((item.count / stats.total) * 100) : 0;
-                return (
-                  <div key={item.key} className="space-y-1">
-                    <div className="flex justify-between text-sm font-medium">
-                      <span className="text-slate-700 font-semibold truncate max-w-[280px] md:max-w-xs" title={item.label}>
-                        {item.label}
-                      </span>
-                      <span className="text-slate-900 shrink-0">{item.count} 人 ({percent}%)</span>
-                    </div>
-                    <div className="w-full bg-slate-100 rounded-full h-3">
-                      <div 
-                        className={`${item.color} h-3 rounded-full transition-all duration-500`} 
-                        style={{ width: `${percent}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                );
-              })}
-            </CardContent>
-          </Card>
-
         </div>
 
         {/* 篩選與搜尋工具欄 */}
         <Card className="border border-slate-200 shadow-sm bg-white">
           <CardContent className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               
               {/* 搜尋框 */}
               <div className="relative">
                 <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
                 <Input 
-                  placeholder="搜尋姓名、電話、電郵..." 
+                  placeholder="搜尋姓名、電郵..." 
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-9 border-slate-200 focus-visible:ring-amber-500"
@@ -510,27 +460,11 @@ export default function Dashboard() {
                 </Select>
               </div>
 
-              {/* 意願篩選 */}
-              <div className="flex items-center gap-2">
-                <Filter className="w-4 h-4 text-slate-400 shrink-0" />
-                <Select value={willEnrollFilter} onValueChange={setWillEnrollFilter}>
-                  <SelectTrigger className="border-slate-200">
-                    <SelectValue placeholder="所有報讀意願" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">所有報讀意願</SelectItem>
-                    <SelectItem value="很有意願，本校是首選之一">很有意願</SelectItem>
-                    <SelectItem value="正在考慮中，希望透過活動加深了解">考慮中</SelectItem>
-                    <SelectItem value="純粹參與活動，暫未有定案">暫未有定案</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
             </div>
           </CardContent>
         </Card>
 
-        {/* 報名數據表格 */}
+        {/* 報名數據表格 (已移除聯絡電話與意願列) */}
         <Card className="border border-slate-200 shadow-sm bg-white overflow-hidden">
           <CardHeader className="bg-slate-50 border-b border-slate-100 p-6 flex flex-row items-center justify-between">
             <div>
@@ -550,10 +484,8 @@ export default function Dashboard() {
                   <TableHead className="font-bold text-slate-700">學生姓名</TableHead>
                   <TableHead className="font-bold text-slate-700">性別</TableHead>
                   <TableHead className="font-bold text-slate-700">班級</TableHead>
-                  <TableHead className="font-bold text-slate-700">聯絡電話</TableHead>
                   <TableHead className="font-bold text-slate-700">電郵地址</TableHead>
                   <TableHead className="font-bold text-slate-700 text-center">隨行家長/兒童</TableHead>
-                  <TableHead className="font-bold text-slate-700 max-w-[200px]">未來報讀意願</TableHead>
                   <TableHead className="font-bold text-slate-700">登記時間</TableHead>
                   <TableHead className="font-bold text-slate-700 text-center">操作</TableHead>
                 </TableRow>
@@ -561,7 +493,7 @@ export default function Dashboard() {
               <TableBody>
                 {filteredRegistrations.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={11} className="text-center py-12 text-slate-400">
+                    <TableCell colSpan={9} className="text-center py-12 text-slate-400">
                       <Info className="w-8 h-8 mx-auto mb-2 text-slate-300" />
                       沒有符合篩選條件的報名資料
                     </TableCell>
@@ -582,15 +514,11 @@ export default function Dashboard() {
                       <TableCell className="font-bold text-slate-900">{r.studentName}</TableCell>
                       <TableCell>{r.gender}</TableCell>
                       <TableCell className="font-semibold">{r.grade}</TableCell>
-                      <TableCell className="font-mono">{r.phone}</TableCell>
-                      <TableCell className="max-w-[180px] truncate" title={r.email}>{r.email}</TableCell>
+                      <TableCell className="max-w-[200px] truncate" title={r.email}>{r.email}</TableCell>
                       <TableCell className="text-center">
                         <span className="text-sm font-medium">
                           家長: {r.parentCount} | 兒童: {r.otherChildrenCount}
                         </span>
-                      </TableCell>
-                      <TableCell className="max-w-[200px] truncate text-xs text-slate-600" title={r.willEnroll}>
-                        {r.willEnroll}
                       </TableCell>
                       <TableCell className="text-slate-500 text-xs">{r.createdAt}</TableCell>
                       <TableCell className="text-center">
